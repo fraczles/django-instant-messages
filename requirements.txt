@@ -1,0 +1,7 @@
+django
+django-extensions
+psycopg2-binary
+werkzeug
+haikunator
+channels
+asgi_redis
