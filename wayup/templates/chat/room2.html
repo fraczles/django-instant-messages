@@ -1,0 +1,79 @@
+<!-- chat/templates/chat/room2.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room</title>
+</head>
+<body>
+    <select id="chat-recipients">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="opel">Opel</option>
+        <option value="audi">Audi</option>
+    </select><br/>
+    <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
+    <input id="chat-message-input" type="text" size="100"/><br/>
+    <input id="chat-message-submit" type="button" value="Send"/>
+</body>
+<script>
+    var roomName = {{ room_name_json }};
+
+    var chatSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName + '/');
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var message = data['message'];
+        document.querySelector('#chat-log').value += (message + '\n');
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    // Get this information from django upfront
+    var users = {
+        volvo: {id: 1, msgs: 'alex: hi \nbob: yo\n'},
+        saab: {id: 2, msgs: 'alex: bro \npete: sup?\n'},
+        opel: {id: 3, msgs: 'alex: ?? \ntim: ???\n'},
+        audi: {id: 4, msgs: 'alex: Hey man \ntim: hows it going?\n'}
+    };
+
+    document.querySelector('#chat-recipients').onchange = function(e) {
+        var name = e.target.value;
+        console.log('Getting messages from ' + name);
+        
+        document.querySelector('#chat-log').value = '';
+        document.querySelector('#chat-log').value += users[name].msgs;
+
+
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        var recipient = document.querySelector('#chat-message-recipient').value;
+        console.log('This message is going to: ' + recipient);
+        var messageInputDom = document.querySelector('#chat-message-input');
+
+        var message = messageInputDom.value;
+        var sender = "{{ user.username }}";
+        var pk = {{ user.pk }};
+
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'user': sender,
+            'pk': pk,
+        }));
+
+        messageInputDom.value = '';
+    };
+</script>
+</html>
