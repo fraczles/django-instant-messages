@@ -4,4 +4,7 @@ psycopg2-binary
 werkzeug
 haikunator
 channels
-asgi_redis
+channels_redis
+redis
+asgiref==2.2.0
+ipdb

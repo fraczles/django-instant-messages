@@ -1,40 +1,43 @@
+import json
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from django.db import transaction
-
-from .models import Room
-
-import haikunator
+from django.utils.safestring import mark_safe
 
 
 # Create your views here.
-def new_room(request):
-    """
-    Randomly create a new room, and redirect to it.
-    """
-    new_room = None
-    h = haikunator.Haikunator()
-    while not new_room:
-        with transaction.atomic():
-            label = h.haikunate()
-            if Room.objects.filter(label=label).exists():
-                continue
-            new_room = Room.objects.create(label=label)
-    return redirect(chat_room, label=label)
 
-
-def about(request):
-    return render(request, "chat/about.html")
-
-
-def chat_room(request, label):
-    # If the room with the given label doesn't exist, automatically create it
-    # upon first visit (a la etherpad).
-    room, created = Room.objects.get_or_create(label=label)
-
-    # We want to show the last 50 messages, ordered most-recent-last
-    messages = reversed(room.messages.order_by('-timestamp')[:50])
-
-    return render(request, "chat/room.html", {
-        'room': room,
-        'messages': messages,
+@login_required(login_url='/accounts/login/')
+def room(request, room_name):
+    return render(request, 'chat/room2.html', {
+        'room_name_json': mark_safe(json.dumps(room_name)),
+        'user': request.user,
     })
+
+
+@login_required(login_url='login/')
+def index(request):
+    return render(request, 'index.html')
+
+
+def login(request):
+    return render(request, 'chat/login.html')
+
+
+def new_user(request):
+    if request.method == 'POST':
+        user = UserCreationForm(request.POST)
+        if user.is_valid():
+            user.save()
+            return redirect('index')
+        else:
+            context = {
+                'form': user
+            }
+            return render(request, 'chat/new_user.html', context)
+    else:
+        context = {
+            'form': UserCreationForm
+        }
+        return render(request, 'chat/new_user.html', context)

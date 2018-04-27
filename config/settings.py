@@ -37,6 +37,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_REDIRECT_URL = '/'
 
 # Application definition
 
@@ -47,6 +48,7 @@ THIRDPARTY = [
 
 FIRSTPARTY = [
     'wayup.chat.apps.ChatConfig',
+    'wayup.api.apps.ApiConfig',
 ]
 
 INSTALLED_APPS = [
@@ -92,11 +94,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Channels
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://redis:6379')],
         },
-        "ROUTING": "chat.routing.channel_routing",
     },
 }
 ASGI_APPLICATION = 'config.routing.application'

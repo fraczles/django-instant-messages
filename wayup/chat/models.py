@@ -1,19 +1,15 @@
 from django.db import models
-from django.utils import timezone
-
-
-# Create your models here.
-class Room(models.Model):
-    name = models.TextField()
-    label = models.SlugField(unique=True)
 
 
 class Message(models.Model):
-    room = models.ForeignKey(
-        Room,
-        related_name='messages',
-        on_delete=models.CASCADE,
+    sender = models.ForeignKey(
+        'auth.User',
+        related_name="sender",
+        on_delete=models.CASCADE
     )
-    handle = models.TextField()
-    message = models.TextField()
-    timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+    reciever = models.ForeignKey(
+        'auth.User',
+        related_name="reciever",
+        on_delete=models.CASCADE
+    )
+    body = models.TextField()
