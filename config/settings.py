@@ -25,6 +25,7 @@ DJANGO_PATH = p(os.path.dirname(__file__), '..', 'wayup')
 # Project root
 PROJECT_PATH = p(DJANGO_PATH, '..')
 
+AUTH_USER_MODEL = 'accounts.User'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -47,8 +48,9 @@ THIRDPARTY = [
 ]
 
 FIRSTPARTY = [
-    'wayup.chat.apps.ChatConfig',
+    'wayup.accounts.apps.AccountsConfig',
     'wayup.api.apps.ApiConfig',
+    'wayup.chat.apps.ChatConfig',
 ]
 
 INSTALLED_APPS = [
@@ -122,16 +124,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',  # noqa
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',  # noqa
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',  # noqa
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',  # noqa
     },
 ]
 

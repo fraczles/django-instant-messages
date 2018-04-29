@@ -1,6 +1,7 @@
 # chat/consumers.py
-from asgiref.sync import async_to_sync
+# from asgiref.sync import async_to_sync
 
+from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
 
@@ -9,17 +10,11 @@ from .models import Message
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.user = self.scope['user']
-        self.room_group_name = 'chat_%s' % self.room_name
 
-        print('It is me, ID: {}, connecting to the socket.'.format(
-            self.user.pk
-        ))
-
-        # Join room group
+        # Join a group named by current user's pk
         async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name,
+            str(self.user.pk),
             self.channel_name
         )
 
@@ -28,32 +23,39 @@ class ChatConsumer(WebsocketConsumer):
     def disconnect(self, close_code):
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name,
+            str(self.user.pk),
             self.channel_name
         )
 
     # Receive message from WebSocket
     def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-
-        message = text_data_json['message']
-        user = text_data_json['user']
-        sender_pk = text_data_json['pk']
+        data = json.loads(text_data)
 
         Message.objects.create(
-            sender_id=sender_pk,
-            reciever_id=self.user.pk,
-            body=message
+            author_id=self.user.pk,
+            recipient_id=data['recipient'],
+            body=data['message']
         )
 
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'user': user,
-            }
-        )
+        if data['type'] == 'message':
+            async_to_sync(self.channel_layer.group_add)(
+                str(data['recipient']),
+                self.channel_name
+            )
+
+            async_to_sync(self.channel_layer.group_send)(
+                str(data['recipient']),
+                {
+                    'type': 'chat_message',
+                    'message': data['message'],
+                    'user': data['user'],
+                }
+            )
+
+            async_to_sync(self.channel_layer.group_discard)(
+                str(data['recipient']),
+                self.channel_name
+            )
 
     # Receive message from room group
     def chat_message(self, event):
