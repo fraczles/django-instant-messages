@@ -16,13 +16,15 @@ def room(request):
     })
 
 
-@login_required(login_url='login/')
-def index(request):
-    return render(request, 'index.html')
-
-
 def messages(user_pk):
-    """ Find all Messages with the user as either the author or recipient """
+    """ Find all Messages with the user as either the author or recipient.
+    Returns a dictionary mapping recipient's keys to a list of messages.
+
+    For example:
+    >>> # Assume alex and jake are friends
+    >>> Message(author=alex, recipient=jake, body="Hello World").save()
+    >>> messages(alex.pk) == { jake.pk: [('alex', 'Hello World')]}
+    """
     friends = set()
     for m in Message.objects.filter(author=user_pk).select_related('recipient'):  # noqa
         friends.add(m.recipient)

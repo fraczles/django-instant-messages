@@ -6,3 +6,7 @@ channels
 channels_redis
 redis
 asgiref==2.2.0
+
+# testing
+pytest
+pytest-django

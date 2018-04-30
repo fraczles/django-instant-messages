@@ -33,6 +33,14 @@
 log in using the credentials created above
 
 
+## Tests:
+Tests are still a WiP. Plan to use selenium to confirm the appropriate users
+are recieving the right messages.
 
-## 
+See: https://channels.readthedocs.io/en/latest/tutorial/part_4.html
+
+- To run tests:
+    ```
+    $ docker-compose run --rm web pytest
+    ```
 
