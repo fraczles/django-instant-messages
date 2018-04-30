@@ -2,10 +2,7 @@ django
 django-extensions
 psycopg2-binary
 werkzeug
-haikunator
 channels
 channels_redis
 redis
 asgiref==2.2.0
-ipdb
-djangorestframework

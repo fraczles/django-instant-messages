@@ -12,15 +12,27 @@ services:
       POSTGRES_DB: postgres
     ports:
       - 5432:5432
+
+  migration:
+    build: .
+    command: python3 manage.py migrate --noinput
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+
   web:
     build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
+    command: python3 manage.py runserver 0.0.0.0:8000 
     volumes:
       - .:/code
     ports:
       - "8000:8000"
     depends_on:
       - db
+      - redis
+      - migration
     environment: 
       PYTHONDONTWRITEBYTECODE: 1
       WERKZEUG_DEBUG_PIN: 'off'
+
