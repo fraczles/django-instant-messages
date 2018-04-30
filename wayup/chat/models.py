@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 
 
 class Message(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+
     author = models.ForeignKey(
         get_user_model(),
         related_name="author",

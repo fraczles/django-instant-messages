@@ -8,3 +8,4 @@ channels_redis
 redis
 asgiref==2.2.0
 ipdb
+djangorestframework

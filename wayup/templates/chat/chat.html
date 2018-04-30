@@ -1,4 +1,4 @@
-<!-- chat/templates/chat/room2.html -->
+<!-- chat/templates/chat/chat.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +15,9 @@
     </select><br/>
 
     {% for friend in friends %}
+
         <textarea class="chat" id="chat-log-{{friend.pk}}" cols="100" rows="20" style='display:none;'></textarea><br/>
+
     {% endfor %}
 
     <!-- <textarea id="chat-log" cols="100" rows="20"></textarea><br/> -->
@@ -27,6 +29,14 @@
     var chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/'
     );
+
+    {% for id, message_list in messages.items %}
+        {% for author, msg in message_list %}
+            var id = "{{id}}";
+            document.querySelector(`#chat-log-${id}`).value += 
+                "{{author}}: {{msg}}\n";
+        {% endfor %}
+    {% endfor %}
 
     chatSocket.onmessage = function(e) {
         var doc = document.getElementById("chat-recipients");
@@ -47,18 +57,27 @@
         }
     };
 
+
+
     document.querySelector('#chat-recipients').onchange = function(e) {
         /* When the dropdown changes */
         var pk = e.target.value;
-        var x = document.querySelectorAll(".chat");
-        for(var i = 0; i < x.length; i++){
-            x[i].style.display = 'none';
+
+        // Hide all chat logs
+        var chatLogs = document.querySelectorAll(".chat");
+        for(var i = 0; i < chatLogs.length; i++){
+            chatLogs[i].style.display = 'none';
         }
-        textarea = document.querySelector(`#chat-log-${pk}`);
-        textarea.style.display = 'block';
-        // document.querySelector('#chat-log').value += users[name].msgs;
 
+        // Show selected chat log 
+        selected = document.querySelector(`#chat-log-${pk}`);
+        selected.style.display = 'block';
 
+        // {% for message in messages %}
+        
+        //     document.querySelector(`#chat-log-${id}`).value += 
+        //         `${"{{message.author.username}}"}: ${"{{message.body}}\n"}`
+        // {% endfor %}
     };
 
     document.querySelector('#chat-message-submit').onclick = function(e) {
