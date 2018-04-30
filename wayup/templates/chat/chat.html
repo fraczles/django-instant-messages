@@ -15,12 +15,9 @@
     </select><br/>
 
     {% for friend in friends %}
-
         <textarea class="chat" id="chat-log-{{friend.pk}}" cols="100" rows="20" style='display:none;'></textarea><br/>
-
     {% endfor %}
 
-    <!-- <textarea id="chat-log" cols="100" rows="20"></textarea><br/> -->
     <input id="chat-message-input" type="text" size="100"/><br/>
     <input id="chat-message-submit" type="button" value="Send"/>
 </body>
@@ -30,6 +27,7 @@
         'ws://' + window.location.host + '/ws/chat/'
     );
 
+    // Populate chat logs with messages from database
     {% for id, message_list in messages.items %}
         {% for author, msg in message_list %}
             var id = "{{id}}";
@@ -38,6 +36,7 @@
         {% endfor %}
     {% endfor %}
 
+    // When a message is recieved from the server
     chatSocket.onmessage = function(e) {
         var doc = document.getElementById("chat-recipients");
         var friend = doc.options[doc.selectedIndex].value;
@@ -46,6 +45,7 @@
         document.querySelector(`#chat-log-${friend}`).value += (message + '\n');
     };
 
+    // When the socket is closed
     chatSocket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
     };
@@ -57,10 +57,8 @@
         }
     };
 
-
-
+    // When the dropdown changes
     document.querySelector('#chat-recipients').onchange = function(e) {
-        /* When the dropdown changes */
         var pk = e.target.value;
 
         // Hide all chat logs
@@ -72,31 +70,21 @@
         // Show selected chat log 
         selected = document.querySelector(`#chat-log-${pk}`);
         selected.style.display = 'block';
-
-        // {% for message in messages %}
-        
-        //     document.querySelector(`#chat-log-${id}`).value += 
-        //         `${"{{message.author.username}}"}: ${"{{message.body}}\n"}`
-        // {% endfor %}
     };
 
+    // When a chat message is sent to the server
     document.querySelector('#chat-message-submit').onclick = function(e) {
-        /* When the message is sent */
         var messageInputDom = document.querySelector('#chat-message-input');
-        var e = document.getElementById("chat-recipients");
-        var id = e.options[e.selectedIndex].value;
-        console.log("I'm sending a message to user.pk: " + id);
-
+        var chat = document.getElementById("chat-recipients");
+        var friend = chat.options[chat.selectedIndex].value;
         var message = messageInputDom.value;
-        var sender = "{{ user.username }}";
-        var pk = {{ user.pk }};
+        var author = "{{ user.username }}";
 
         chatSocket.send(JSON.stringify({
             'type': 'message',
             'message': message,
-            'user': sender,
-            'pk': id,
-            'recipient': id,
+            'recipient': friend,
+            'user': author,
         }));
 
         messageInputDom.value = '';

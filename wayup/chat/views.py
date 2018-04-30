@@ -1,13 +1,6 @@
-import json
-
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from django.db.models import Q
-from django.utils.safestring import mark_safe
-
-from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
 
 from .models import Message
 
@@ -47,5 +40,4 @@ def messages(user_pk):
 
         data[friend.pk] = list(messages)
 
-    print(data)
     return data

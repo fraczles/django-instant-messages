@@ -49,7 +49,6 @@ THIRDPARTY = [
 
 FIRSTPARTY = [
     'wayup.accounts.apps.AccountsConfig',
-    'wayup.api.apps.ApiConfig',
     'wayup.chat.apps.ChatConfig',
 ]
 
